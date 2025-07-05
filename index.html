@@ -192,6 +192,7 @@
 
       const anterior = document.getElementById('prev');
       const proximo = document.getElementById('next');
+      
       async function render(p, c, cx, sc=1.5) {
         const pg = await pdfDoc.getPage(p);
         const vp = pg.getViewport({ scale: sc });
@@ -199,6 +200,7 @@
         await pg.render({ canvasContext: cx, viewport: vp }).promise;
         pageInd.textContent = p + ' / ' + pdfDoc.numPages;
       }
+
       pdfjsLib.getDocument(url).promise.then(pdf => { pdfDoc = pdf; render(pageNum, canvas, ctx); });
       if (modal.style.display != 'flex') {
         anterior.style.display = 'none';
@@ -207,6 +209,7 @@
         anterior.style.display = 'flex';
         proximo.style.display = 'flex';
       }
+
       anterior.onclick = () => { if (pageNum > 1) render(--pageNum, canvas, ctx); };
       proximo.onclick = () => { if (pageNum < pdfDoc.numPages) render(++pageNum, canvas, ctx); };
       document.getElementById('open-modal').onclick = () => { modal.style.display='flex'; render(pageNum,mCanvas,mCtx,2);};
