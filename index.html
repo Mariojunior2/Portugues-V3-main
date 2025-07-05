@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Notícias em PDF</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    /* Estilo geral de jornal */
+    body {
+      background: #fdf6e3 url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+      font-family: 'Georgia', serif;
+      margin: 0; padding: 0;
+    }
+    h1 {
+      background: #f5deb3;
+      padding: 1.5vh 0;
+      text-align: center;
+      margin: 0;
+      border-bottom: 2px solid #ccc;
+      font-size: 4vw;
+    }
+
+    /* Container PDF principal: mostra trecho, clip overflow */
+    #pdf-container {
+      position: relative;
+      width: 60vw;
+      height: 40vh; /* mostra só metade da página */
+      margin: 5vh auto;
+      background: #fffef7;
+      overflow: hidden;
+      border: 1px solid #e0d7c3;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    canvas {
+      width: 100%; height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* Navegação inline fixa nos cantos inferiores */
+    .nav-inline {
+      position: absolute;
+      bottom: 0.5vh;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 2vw;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+    #pdf-container:hover .nav-inline { opacity: 1; }
+    .nav-inline button {
+      background: rgba(224,208,195,0.8);
+      color: #5a3e2b;
+      border: 1px solid #bca089;
+      padding: 0.5vh 1vw;
+      font-size: 1.2vw;
+      cursor: pointer;
+      border-radius: 0;
+    }
+
+    /* Botão abrir modal discreto */
+    .open-modal {
+      position: absolute;
+      top: 1vh; right: 1vw;
+      background: rgba(224,208,195,0.8);
+      color: #5a3e2b;
+      border: 1px solid #bca089;
+      padding: 0.5vh 1vw;
+      font-size: 1vw; cursor: pointer;
+      opacity: 0.5; transition: opacity 0.3s;
+      border-radius: 0;
+    }
+    #pdf-container:hover .open-modal { opacity: 1; }
+
+    /* Modal full-screen */
+    #pdf-modal {
+      position: fixed; top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.9);
+      display: none; align-items: center; justify-content: center;
+      z-index: 1000; overflow-y: auto;
+    }
+    .modal-content {
+      position: relative;
+      width: 55vw;
+      max-height: 90vh;
+      background: #fffef7;
+      padding: 2vh 2vw;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+      border: 1px solid #e0d7c3;
+      overflow-y: auto;
+    }
+
+    /* Botão fechar modal discreto e fixo no canto */
+    .close-modal {
+      position: fixed; top: 2vh; right: 2vw;
+      background: rgba(224,208,195,0.8);
+      color: #5a3e2b;
+      border: 1px solid #bca089;
+      padding: 0.5vh 1vw;
+      font-size: 1vw; cursor: pointer; border-radius: 0;
+      opacity: 0.5; transition: opacity 0.3s;
+      z-index: 1010;
+    }
+    .modal-content:hover ~ .close-modal, #pdf-modal:hover .close-modal { opacity: 1; }
+
+    /* Navegação modal fixa nos cantos inferiores */
+    .modal-nav {
+      position: fixed;
+      bottom: 2vh;
+      width: 100%; display: flex;
+      justify-content: space-between;
+      padding: 0 2vw;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+      z-index: 1010;
+    }
+    .modal-content:hover ~ .modal-nav, #pdf-modal:hover .modal-nav { opacity: 1; }
+    .modal-nav button {
+      background: rgba(224,208,195,0.8);
+      color: #5a3e2b;
+      border: 1px solid #bca089;
+      padding: 0.5vh 1vw;
+      font-size: 2vw; cursor: pointer; border-radius: 0;
+    }
+
+    /* Indicador de página fixo no rodapé modal */
+    .page-indicator {
+      position: fixed;
+      bottom: 2vh;
+      left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,0.8);
+      color: #5a3e2b;
+      font-size: 1vw;
+      padding: 0.5vh 1vw;
+      border: 1px solid #ccc;
+      border-radius: 0;
+      z-index: 1010;
+    }
+
+    .open-modal {
+      clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%);
+      transition: clip-path 0.4s ease;
+    }
+    .open-modal:hover {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+    
+
+    @media(max-width:768px) {
+      #pdf-container, .modal-content { width:90vw; }
+      h1 { font-size:6vw; }
+      .nav-inline button, .open-modal, .close-modal, .modal-nav button { font-size:3vw; padding:2vh 3vw; }
+      .page-indicator { font-size:2vw; padding:2vh 4vw; }
+    }
+  </style>
+</head>
+<body>
+  <h1> INFO NEWS </h1>
+  <div id="pdf-container">
+    <canvas id="pdf-render"></canvas>
+    <button type="button" class="open-modal" id="open-modal">Abrir Jornal</button>
+    <div class="nav-inline">
+      <button type="button" id="prev">←</button>
+      <button type="button" id="next">→</button>
+    </div>
+  </div>
+
+
+  <div id="pdf-modal">
+    <div class="modal-content">
+      <canvas id="modal-render"></canvas>
+    </div>
+    <button type="button"  class="close-modal" id="modal-close">✕</button>
+    <div class="modal-nav">
+      <button type="button" id="modal-prev">←</button>
+      <button type="button"  id="modal-next">→</button>
+    </div>
+    <div class="page-indicator" id="modal-page-num">1 / 1</div>
+  </div>
+
+  <script type="module">
+    import * as pdfjsLib from './assets/pdfjs/pdf.mjs';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = './assets/pdfjs/pdf.worker.mjs';
+    document.addEventListener('DOMContentLoaded', () => {
+      const url = './assets/noticias/jornal.pdf'; let pdfDoc=null, pageNum=1;
+      const canvas = document.getElementById('pdf-render'), ctx = canvas.getContext('2d');
+      const modal = document.getElementById('pdf-modal');
+      const mCanvas = document.getElementById('modal-render'), mCtx = mCanvas.getContext('2d');
+      const pageInd = document.getElementById('modal-page-num');
+
+      const anterior = document.getElementById('prev');
+      const proximo = document.getElementById('next');
+      async function render(p, c, cx, sc=1.5) {
+        const pg = await pdfDoc.getPage(p);
+        const vp = pg.getViewport({ scale: sc });
+        c.width = vp.width; c.height = vp.height;
+        await pg.render({ canvasContext: cx, viewport: vp }).promise;
+        pageInd.textContent = p + ' / ' + pdfDoc.numPages;
+      }
+      pdfjsLib.getDocument(url).promise.then(pdf => { pdfDoc = pdf; render(pageNum, canvas, ctx); });
+      if (modal.style.display != 'flex') {
+        anterior.style.display = 'none';
+        proximo.style.display = 'none';
+      } else {
+        anterior.style.display = 'flex';
+        proximo.style.display = 'flex';
+      }
+      anterior.onclick = () => { if (pageNum > 1) render(--pageNum, canvas, ctx); };
+      proximo.onclick = () => { if (pageNum < pdfDoc.numPages) render(++pageNum, canvas, ctx); };
+      document.getElementById('open-modal').onclick = () => { modal.style.display='flex'; render(pageNum,mCanvas,mCtx,2);};
+      document.getElementById('modal-close').onclick = () => { modal.style.display='none'; };
+      document.addEventListener('keydown', e => { if(e.key==='Escape') modal.style.display='none'; });
+      document.getElementById('modal-prev').onclick = () => { if(pageNum>1) render(--pageNum, mCanvas, mCtx,2); };
+      document.getElementById('modal-next').onclick = () => { if(pageNum<pdfDoc.numPages) render(++pageNum, mCanvas, mCtx,2); };
+    });
+  </script>
+</body>
+</html>

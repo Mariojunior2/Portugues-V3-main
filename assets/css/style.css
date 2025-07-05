@@ -1,0 +1,138 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background-color: #fdf6e3;
+    background: #fdf6e3 url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+    color: #222;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+
+  }
+  
+  h1 {
+    text-align: center;
+    font-size: 2.5em;
+    padding: 20px 0;
+    background-color: #f5deb3;
+    margin: 0;
+    border-bottom: 2px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+
+  #pdf-container {
+    max-width: 900px;
+    margin: 30px auto;
+    background: #fffef7;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border: 1px solid #e0d7c3;
+    padding: 20px;
+    border-radius: 4px;
+    flex: 1;
+    width: 90%;
+  }
+  
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: block;
+  }
+
+  #navigation {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  button {
+    padding: 10px 20px;
+    font-size: 1em;
+    font-family: 'Georgia', serif;
+    background: linear-gradient(to bottom right, #fdf6e3, #e0d7c3);
+    border: 1px solid #bbb;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #ccc;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    min-width: 130px;
+    text-align: center;
+  }
+  
+  button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -40px;
+    width: 40px;
+    height: 100%;
+    background: linear-gradient(to left, #d4c7a8, transparent);
+    transform: skewX(-25deg);
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+  
+  button:hover {
+    transform: translateY(-2px) rotate(-0.5deg);
+    box-shadow: 4px 4px 0 #aaa;
+  }
+  
+  button:hover::before {
+    right: 0;
+  }
+  
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #f5deb3;
+    color: #555;
+    font-size: 0.9em;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: auto;
+
+   
+  }
+  
+  @media (max-width: 600px) {
+    h1 {
+      font-size: 2em;
+      padding: 15px 10px;
+    }
+  
+    #pdf-container {
+      width: 100%;
+      margin: 15px auto;
+      padding: 10px;
+    }
+  
+    button {
+      min-width: 100px;
+      padding: 8px 15px;
+      font-size: 0.9em;
+    }
+  
+    #navigation {
+      gap: 10px;
+    }
+  }
+  
